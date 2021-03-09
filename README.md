@@ -1,9 +1,16 @@
-Full web development stack: PHP/Apache/MySQL/phpmyadmin
+Full web development stack: (PHP/Apache/MySQL/phpmyadmin)
 ===================================
 
 ### Persisting database
-To enable database persistence uncomment the line
+To enable database persistence add the line
 ```
-- data:/var/lib/mysql
+    - mysql_data:/var/lib/mysql
 ```
-under mysql section of 'docker-compose.yaml'.
+under 'volumes' section of service 'mysql'
+in 'docker-compose.yaml'.
+```
+services:
+    mysql:
+        volumes:
+```
+
