@@ -1,0 +1,56 @@
+version: "3.2"
+services:
+  php:
+    build: 
+      context: './php/'
+      args:
+       PHP_VERSION: "${PHP_VERSION}"
+    networks:
+      - backend
+    volumes:
+      - ${PROJECT_ROOT}/:/var/www/html/
+    ports:
+      - "80:80"
+    container_name: php
+  mysql:
+    image: mysql:${MYSQL_VERSION:-latest}
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql.cnf:/etc/mysql/conf.d/custom.cnf
+      - ./databases/:/docker-entrypoint-initdb.d/
+    networks:
+      - backend
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_USER: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+    container_name: mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: "${DB_ROOT_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+      MYSQL_USER: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+    container_name: phpmyadmin
+    ports:
+      - "8080:80"
+    networks:
+      - backend
+      - frontend
+networks:
+  frontend:
+  backend:
+volumes:
+    mysql_data:
+    pma:
